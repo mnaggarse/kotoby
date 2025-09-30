@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import connectDB from "./config/db";
+import type { Book } from "./types";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [books, setBooks] = useState<Book[]>([]);
+
+  useEffect(() => {
+    const loadBooks = async () => {
+      const db = await connectDB();
+      if (!db) return;
+
+      const res = await db.query("SELECT * FROM books;");
+      setBooks(res.values ?? []);
+    };
+
+    loadBooks();
+  }, []);
+
+  const addBook = async () => {
+    const db = await connectDB();
+    if (!db) return;
+
+    await db.run(
+      "INSERT INTO books (title, cover, pages, read, rating) VALUES (?, ?, ?, ?, ?);",
+      ["My first book", "testcover", 234, 54, 3]
+    );
+
+    const res = await db.query("SELECT * FROM books;");
+    setBooks(res.values ?? []);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="p-8">
+      <button onClick={addBook} className="p-2 border">
+        Add
+      </button>
+      <ul>
+        {books.map((book, i) => (
+          <li key={i}>{book.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
 }
-
-export default App
