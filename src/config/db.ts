@@ -25,14 +25,17 @@ export default async function connectDB() {
 
     await db.open();
 
-    await db.execute(`CREATE TABLE IF NOT EXISTS books (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      cover TEXT NOT NULL,
-      pages INTEGER NOT NULL DEFAULT 1,
-      read INTEGER NOT NULL DEFAULT 1,
-      rating INTEGER NOT NULL DEFAULT 0
-    );`);
+    // await db.execute("DROP TABLE IF EXISTS books;");
+    await db.execute(
+      `CREATE TABLE IF NOT EXISTS books (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        cover TEXT NOT NULL,
+        pages INTEGER NOT NULL DEFAULT 1,
+        read INTEGER NOT NULL DEFAULT 1,
+        rating INTEGER NOT NULL DEFAULT 0
+      );`
+    );
 
     return db;
   } catch (err) {

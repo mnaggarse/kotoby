@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import BookCard from "./components/BookCard";
+import PageTitle from "./components/PageTitle";
 import connectDB from "./config/db";
 import type { Book } from "./types";
 
@@ -11,7 +13,7 @@ export default function App() {
       if (!db) return;
 
       const res = await db.query("SELECT * FROM books;");
-      setBooks(res.values ?? []);
+      setBooks(res.values as Book[]);
     };
 
     loadBooks();
@@ -22,24 +24,32 @@ export default function App() {
     if (!db) return;
 
     await db.run(
-      "INSERT INTO books (title, cover, pages, read, rating) VALUES (?, ?, ?, ?, ?);",
-      ["My first book", "testcover", 234, 54, 3]
+      "INSERT INTO books (title, cover, pages, read) VALUES (?, ?, ?, ?)",
+      [
+        "الرحيق المختوم",
+        "https://tailwindcss.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fbook-promo.27d91093.png&w=128&q=75",
+        542,
+        320,
+      ]
     );
 
     const res = await db.query("SELECT * FROM books;");
-    setBooks(res.values ?? []);
+    setBooks(res.values as Book[]);
   };
 
   return (
-    <div className="p-8">
-      <button onClick={addBook} className="p-2 border">
-        Add
+    <div className="py-12 px-4">
+      <PageTitle>المكتبة</PageTitle>
+
+      <button onClick={addBook} className="border p-2">
+        Add Book
       </button>
-      <ul>
-        {books.map((book, i) => (
-          <li key={i}>{book.title}</li>
+
+      <div className="space-y-2">
+        {books.map((book) => (
+          <BookCard key={book.id} book={book} />
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
