@@ -34,11 +34,9 @@ export default function BookCard({
         </Text>
         <View>
           {pages && <Text style={styles.pages}>{pages} pages</Text>}
-          {progress > 0 && (
-            <View style={styles.progressBarContainer}>
-              <View style={[styles.progressBar, { width: `${progress}%` }]} />
-            </View>
-          )}
+          <View style={styles.progressBarContainer}>
+            <View style={[styles.progressBar, { width: `${progress}%` }]} />
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -77,15 +75,16 @@ const styles = StyleSheet.create({
     color: "#6c757d",
   },
   progressBarContainer: {
-    height: 6,
+    height: 10,
     width: "100%",
     backgroundColor: "#e9ecef",
-    borderRadius: 3,
+    borderRadius: 100,
     marginTop: 4,
     overflow: "hidden",
   },
   progressBar: {
     height: "100%",
+    borderRadius: 100,
     backgroundColor: "#007bff",
   },
 });

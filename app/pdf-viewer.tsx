@@ -25,7 +25,7 @@ export default function PdfViewer() {
     currentPage?: string;
   }>();
   const navigation = useNavigation();
-  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimer = useRef<number>(null);
 
   useLayoutEffect(() => {
     navigation.setOptions({ title: name });
@@ -52,7 +52,7 @@ export default function PdfViewer() {
     }
     debounceTimer.current = setTimeout(() => {
       saveCurrentPage(page);
-    }, 500); // Save after 500ms of inactivity
+    }, 0); // Save after 500ms of inactivity
   };
 
   // Cleanup timer on component unmount
