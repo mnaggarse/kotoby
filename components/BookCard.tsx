@@ -40,7 +40,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     flexDirection: "row",
     gap: 8,
-    marginBottom: 8,
   },
   cover: {
     width: 90,

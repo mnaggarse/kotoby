@@ -1,4 +1,3 @@
-import AddBookButton from "@/components/AddBookButton";
 import BookOptionsBottomSheet from "@/components/BookOptionsBottomSheet";
 import { addBooks, deleteBook, getAllBooks } from "@/database/books";
 import { Book } from "@/types";
@@ -6,7 +5,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { useIsFocused } from "@react-navigation/native";
 import * as DocumentPicker from "expo-document-picker";
 import { useNavigation, useRouter } from "expo-router";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import PdfPageImage from "react-native-pdf-page-image";
 import BookCard from "../components/BookCard";
@@ -47,16 +46,9 @@ export default function Index() {
       }))
     );
 
-    // Add files to the database and update the list
     await addBooks(selectedFiles);
     await loadBooks();
   };
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => <AddBookButton onPress={handleSelectFiles} />,
-    });
-  }, [navigation, handleSelectFiles]);
 
   const handleLongPress = (book: Book) => {
     setSelectedBook(book);
@@ -78,7 +70,7 @@ export default function Index() {
           No books added yet. Press the '+' icon to add your first book.
         </Text>
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.bookList}>
           {books.map((book) => (
             <BookCard
               key={book.id}
@@ -112,8 +104,13 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    paddingTop: 32,
+    paddingHorizontal: 8,
     backgroundColor: "#f8f9fa",
+  },
+  bookList: {
+    paddingBottom: 16,
+    gap: 8,
   },
   emptyText: {
     textAlign: "center",

@@ -4,17 +4,17 @@ import React, { forwardRef, useCallback, useMemo } from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 type Props = {
-  book: Book;
+  book?: Book;
   onDelete: () => void;
   onClose: () => void;
 };
 
 const BookOptionsBottomSheet = forwardRef<BottomSheet, Props>(
   ({ book, onDelete, onClose }, ref) => {
-    const snapPoints = useMemo(() => ["25%", "35%"], []);
+    const snapPoints = useMemo(() => ["28%"], []);
 
     const renderBackdrop = useCallback(
-      (props: any) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />,
+      (props: any) => <BottomSheetBackdrop opacity={0.3} {...props} disappearsOnIndex={-1} />,
       []
     );
 
