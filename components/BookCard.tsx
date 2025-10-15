@@ -1,39 +1,25 @@
+import { Book } from "@/types";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Pdf from "react-native-pdf";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
-  uri: string;
-  name: string;
-  pages?: number;
-  currentPage?: number;
+  book: Book;
   onPress?: () => void;
   onOpenOptions: () => void;
 };
 
-export default function BookCard({
-  uri,
-  name,
-  pages,
-  currentPage,
-  onPress,
-  onOpenOptions,
-}: Props) {
-  const progress = pages && currentPage ? (currentPage / pages) * 100 : 0;
+export default function BookCard({ book, onPress, onOpenOptions }: Props) {
+  const progress = (book.currentPage / book.pageCount) * 100;
 
   return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={onPress}
-      onLongPress={onOpenOptions}
-    >
-      <Pdf source={{ uri }} page={1} singlePage={true} style={styles.cover} />
+    <TouchableOpacity style={styles.card} onPress={onPress} onLongPress={onOpenOptions}>
+      <Image source={{ uri: book.cover }} style={styles.cover} resizeMode="cover" />
       <View style={styles.infoContainer}>
         <Text numberOfLines={3} style={styles.title}>
-          {name}
+          {book.name}
         </Text>
         <View>
-          {pages && <Text style={styles.pages}>{pages} pages</Text>}
+          <Text style={styles.pages}>{book.pageCount} pages</Text>
           <View style={styles.progressBarContainer}>
             <View style={[styles.progressBar, { width: `${progress}%` }]} />
           </View>

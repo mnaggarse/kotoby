@@ -6,7 +6,7 @@ export default function Layout() {
     <GestureHandlerRootView>
       <Stack screenOptions={{ headerShown: true }}>
         <Stack.Screen name="index" options={{ title: "المكتبة" }} />
-        <Stack.Screen name="pdf-viewer" options={{ title: "" }} />
+        <Stack.Screen name="pdf-viewer" />
       </Stack>
     </GestureHandlerRootView>
   );

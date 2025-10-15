@@ -1,34 +1,31 @@
+import { Book } from "@/types";
 import * as SQLite from "expo-sqlite";
 
-const db = SQLite.openDatabaseSync("books.db");
+const db = SQLite.openDatabaseSync("kotoby.db");
 
 db.execAsync(`
+  -- DROP TABLE IF EXISTS books;
   CREATE TABLE IF NOT EXISTS books (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uri TEXT NOT NULL,
     name TEXT NOT NULL,
-    uri TEXT UNIQUE NOT NULL,
-    pages INTEGER,
+    cover TEXT NOT NULL,
+    pageCount INTEGER,
     currentPage INTEGER
   );
 `);
 
 export async function getAllBooks() {
   const result = await db.getAllAsync("SELECT * FROM books ORDER BY id DESC");
-  return result as {
-    id: number;
-    name: string;
-    uri: string;
-    pages?: number;
-    currentPage?: number;
-  }[];
+  return result as Book[];
 }
 
-export async function addBooks(books: { name: string; uri: string }[]) {
+export async function addBooks(books: Book[]) {
   for (const book of books) {
-    await db.runAsync("INSERT OR IGNORE INTO books (name, uri) VALUES (?, ?)", [
-      book.name,
-      book.uri,
-    ]);
+    await db.runAsync(
+      "INSERT INTO books (uri, name, cover, pageCount, currentPage) VALUES (?, ?, ?, ?, ?)",
+      [book.uri, book.name, book.cover, book.pageCount, book.currentPage]
+    );
   }
 }
 
@@ -36,10 +33,6 @@ export async function deleteBook(uri: string) {
   await db.runAsync("DELETE FROM books WHERE uri = ?", [uri]);
 }
 
-export async function updatePages(uri: string, pages: number) {
-  await db.runAsync("UPDATE books SET pages = ? WHERE uri = ?", [pages, uri]);
-}
-
-export async function updateCurrentPage(uri: string, page: number) {
-  await db.runAsync("UPDATE books SET currentPage = ? WHERE uri = ?", [page, uri]);
+export async function updateCurrentPage(uri: string, currentPage: number) {
+  await db.runAsync("UPDATE books SET currentPage = ? WHERE uri = ?", [currentPage, uri]);
 }

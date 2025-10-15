@@ -1,6 +1,8 @@
-export type PdfFile = {
-  name: string;
+export interface Book {
+  id?: number;
   uri: string;
-  pages?: number;
-  currentPage?: number;
-};
+  name: string;
+  cover: string;
+  pageCount: number;
+  currentPage: number;
+}

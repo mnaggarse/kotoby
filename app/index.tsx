@@ -1,63 +1,64 @@
 import AddBookButton from "@/components/AddBookButton";
 import BookOptionsBottomSheet from "@/components/BookOptionsBottomSheet";
-import { addBooks, deleteBook, getAllBooks, updatePages } from "@/database/books";
-import { PdfFile } from "@/types";
+import { addBooks, deleteBook, getAllBooks } from "@/database/books";
+import { Book } from "@/types";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { useIsFocused } from "@react-navigation/native";
 import * as DocumentPicker from "expo-document-picker";
-import { useFocusEffect, useNavigation, useRouter } from "expo-router";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useNavigation, useRouter } from "expo-router";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import Pdf from "react-native-pdf";
+import PdfPageImage from "react-native-pdf-page-image";
 import BookCard from "../components/BookCard";
 
 export default function Index() {
-  const [pdfs, setPdfs] = useState<PdfFile[]>([]);
-  const [processingFile, setProcessingFile] = useState<PdfFile | null>(null);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [selectedBook, setSelectedBook] = useState<Book>();
+  const bottomSheetRef = useRef<BottomSheet>(null);
   const router = useRouter();
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
-  const [selectedBook, setSelectedBook] = useState<PdfFile | null>(null);
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const loadBooks = useCallback(async () => {
+    const result = await getAllBooks();
+    setBooks(result);
+  }, []);
 
-  // تحميل الكتب من قاعدة البيانات عند التركيز
-  useFocusEffect(
-    useCallback(() => {
-      (async () => {
-        const storedBooks = await getAllBooks();
-        setPdfs(storedBooks);
-      })();
-    }, [])
-  );
+  useEffect(() => {
+    if (isFocused) {
+      loadBooks();
+    }
+  }, [isFocused, loadBooks]);
 
-  // اختيار كتب جديدة
-  const handleSelectFile = useCallback(async () => {
+  const handleSelectFiles = async () => {
     const result = await DocumentPicker.getDocumentAsync({
       type: "application/pdf",
       multiple: true,
     });
 
     if (result.canceled) return;
+    const selectedFiles = await Promise.all(
+      result.assets.map(async (file) => ({
+        uri: file.uri,
+        name: file.name,
+        cover: (await PdfPageImage.generate(file.uri, 0, 1)).uri,
+        pageCount: (await PdfPageImage.open(file.uri)).pageCount,
+        currentPage: 0,
+      }))
+    );
 
-    const newFiles = result.assets.map((f) => ({
-      name: f.name,
-      uri: f.uri,
-    }));
-
-    await addBooks(newFiles);
-    const updated = await getAllBooks();
-    setPdfs(updated);
-
-    const fileToProcess = newFiles.find((f) => !f.pages);
-    setProcessingFile(fileToProcess || null);
-  }, []);
+    // Add files to the database and update the list
+    await addBooks(selectedFiles);
+    await loadBooks();
+  };
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => <AddBookButton onPress={handleSelectFile} />,
+      headerRight: () => <AddBookButton onPress={handleSelectFiles} />,
     });
-  }, [navigation, handleSelectFile]);
+  }, [navigation, handleSelectFiles]);
 
-  const handleOpenOptions = (book: PdfFile) => {
+  const handleLongPress = (book: Book) => {
     setSelectedBook(book);
     bottomSheetRef.current?.expand();
   };
@@ -65,54 +66,34 @@ export default function Index() {
   const handleDeleteBook = async () => {
     if (selectedBook) {
       await deleteBook(selectedBook.uri);
-      const updated = await getAllBooks();
-      setPdfs(updated);
+      await loadBooks();
     }
     bottomSheetRef.current?.close();
   };
 
-  const handleUpdatePageCount = async (uri: string, pages: number) => {
-    await updatePages(uri, pages);
-    const updated = await getAllBooks();
-    setPdfs(updated);
-  };
-
   return (
     <View style={styles.container}>
-      {processingFile && (
-        <Pdf
-          source={{ uri: processingFile.uri }}
-          onLoadComplete={(numberOfPages) =>
-            handleUpdatePageCount(processingFile.uri, numberOfPages)
-          }
-          style={styles.hiddenPdf}
-        />
-      )}
-
-      {pdfs.length === 0 ? (
+      {books.length === 0 ? (
         <Text style={styles.emptyText}>
           No books added yet. Press the '+' icon to add your first book.
         </Text>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
-          {pdfs.map((file) => (
+          {books.map((book) => (
             <BookCard
-              key={file.uri}
-              uri={file.uri}
-              name={file.name}
-              pages={file.pages}
-              currentPage={file.currentPage}
+              key={book.id}
+              book={book}
               onPress={() =>
                 router.push({
                   pathname: "/pdf-viewer",
                   params: {
-                    uri: file.uri,
-                    name: file.name,
-                    currentPage: file.currentPage,
+                    uri: book.uri,
+                    name: book.name,
+                    currentPage: book.currentPage,
                   },
                 })
               }
-              onOpenOptions={() => handleOpenOptions(file)}
+              onOpenOptions={() => handleLongPress(book)}
             />
           ))}
         </ScrollView>
@@ -139,11 +120,5 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: "#6c757d",
-  },
-  hiddenPdf: {
-    position: "absolute",
-    width: 1,
-    height: 1,
-    opacity: 0,
   },
 });

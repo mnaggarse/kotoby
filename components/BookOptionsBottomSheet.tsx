@@ -1,18 +1,10 @@
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
+import { Book } from "@/types";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { forwardRef, useCallback, useMemo } from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-type PdfFile = {
-  name: string;
-  uri: string;
-  pages?: number;
-};
-
 type Props = {
-  book: PdfFile | null;
+  book: Book;
   onDelete: () => void;
   onClose: () => void;
 };
@@ -29,17 +21,14 @@ const BookOptionsBottomSheet = forwardRef<BottomSheet, Props>(
     return (
       <BottomSheet
         ref={ref}
-        index={-1} // -1 means the sheet is closed
+        index={-1}
         snapPoints={snapPoints}
         enablePanDownToClose={true}
         backdropComponent={renderBackdrop}
       >
         <BottomSheetView style={styles.content}>
           <Text style={styles.title}>{book?.name || "Book Options"}</Text>
-          <TouchableOpacity
-            style={[styles.button, styles.deleteButton]}
-            onPress={onDelete}
-          >
+          <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={onDelete}>
             <Text style={styles.buttonText}>Delete Book</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={onClose}>
