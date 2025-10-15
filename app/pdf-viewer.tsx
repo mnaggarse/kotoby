@@ -1,6 +1,7 @@
 import { updateCurrentPage } from "@/database/books";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { StatusBar } from "expo-status-bar";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import Pdf from "react-native-pdf";
 
@@ -15,7 +16,11 @@ export default function PdfViewer() {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title: name, headerShown: isHeaderVisible });
+    navigation.setOptions({
+      title: name,
+      headerShown: isHeaderVisible,
+      headerBackVisible: isHeaderVisible,
+    });
   }, [navigation, name, isHeaderVisible]);
 
   // Toggles the header visibility on single tap
@@ -40,6 +45,7 @@ export default function PdfViewer() {
 
   return (
     <View style={styles.container}>
+      <StatusBar hidden={!isHeaderVisible} />
       <Pdf
         source={{ uri }}
         page={currentPage ? parseInt(currentPage, 10) : 1}
@@ -47,7 +53,6 @@ export default function PdfViewer() {
         onPageSingleTap={handleSingleTap}
         style={styles.pdf}
         maxScale={4}
-        spacing={4}
       />
     </View>
   );

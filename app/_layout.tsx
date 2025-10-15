@@ -1,43 +1,15 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function Layout() {
   return (
     <GestureHandlerRootView>
-      <Tabs screenOptions={{ headerShown: false }}>
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: "المكتبة",
-            tabBarIcon: ({ color, size }) => <Ionicons name="library" size={size} color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="add-book"
-          options={{
-            title: "أضف كتب",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="add-circle" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="profile"
-          options={{
-            title: "الملف الشخصي",
-            tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="pdf-viewer"
-          options={{
-            href: null,
-            headerShown: true,
-            tabBarStyle: { display: "none" },
-          }}
-        />
-      </Tabs>
+      <StatusBar style="dark" />
+      <Stack screenOptions={{ headerShown: true }}>
+        <Stack.Screen name="index" options={{ title: "المكتبة" }} />
+        <Stack.Screen name="pdf-viewer" options={{ headerTitleAlign: "center" }} />
+      </Stack>
     </GestureHandlerRootView>
   );
 }

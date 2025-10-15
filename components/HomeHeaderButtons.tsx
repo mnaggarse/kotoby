@@ -1,12 +1,14 @@
 import { addBooks } from "@/database/books";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import * as DocumentPicker from "expo-document-picker";
-import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import PdfPageImage from "react-native-pdf-page-image";
 
-export default function AddBook() {
-  const router = useRouter();
+type Props = {
+  onBooksAdded: () => void;
+};
 
+export default function HomeHeaderButtons({ onBooksAdded }: Props) {
   const handleSelectFiles = async () => {
     const result = await DocumentPicker.getDocumentAsync({
       type: "application/pdf",
@@ -26,34 +28,27 @@ export default function AddBook() {
     );
 
     await addBooks(selectedFiles);
-    router.back();
+    onBooksAdded();
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={handleSelectFiles}>
-        <Text style={styles.buttonText}>Select from storage</Text>
+    <View style={styles.headerButtonsContainer}>
+      <TouchableOpacity onPress={handleSelectFiles}>
+        <FontAwesome6 name="plus" size={22} color="black" />
+      </TouchableOpacity>
+
+      <TouchableOpacity>
+        <FontAwesome6 name="gear" size={18} color="black" />
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 16,
-    gap: 16,
-  },
-  button: {
-    backgroundColor: "#007bff",
-    padding: 20,
-    borderRadius: 8,
+  headerButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
+    gap: 16,
   },
 });
