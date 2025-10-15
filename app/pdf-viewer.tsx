@@ -1,5 +1,4 @@
-import { PdfFile } from "@/types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { updateCurrentPage } from "@/database/books";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
@@ -31,36 +30,16 @@ export default function PdfViewer() {
     navigation.setOptions({ title: name });
   }, [navigation, name]);
 
-  const saveCurrentPage = async (page: number) => {
-    try {
-      const stored = await AsyncStorage.getItem("pdf_files");
-      const pdfs: PdfFile[] = JSON.parse(stored || "[]");
-
-      const updatedPdfs = pdfs.map((pdf) =>
-        pdf.uri === uri ? { ...pdf, currentPage: page } : pdf
-      );
-
-      await AsyncStorage.setItem("pdf_files", JSON.stringify(updatedPdfs));
-    } catch (error) {
-      console.error("Failed to save current page", error);
-    }
-  };
-
   const handlePageChanged = (page: number) => {
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(() => {
-      saveCurrentPage(page);
-    }, 0); // Save after 500ms of inactivity
+      updateCurrentPage(uri, page);
+    }, 0);
   };
 
-  // Cleanup timer on component unmount
   useEffect(() => {
     return () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-      }
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
     };
   }, []);
 

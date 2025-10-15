@@ -1,17 +1,11 @@
 import AddBookButton from "@/components/AddBookButton";
 import BookOptionsBottomSheet from "@/components/BookOptionsBottomSheet";
+import { addBooks, deleteBook, getAllBooks, updatePages } from "@/database/books";
 import { PdfFile } from "@/types";
 import BottomSheet from "@gorhom/bottom-sheet";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as DocumentPicker from "expo-document-picker";
 import { useFocusEffect, useNavigation, useRouter } from "expo-router";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Pdf from "react-native-pdf";
 import BookCard from "../components/BookCard";
@@ -22,58 +16,39 @@ export default function Index() {
   const router = useRouter();
   const navigation = useNavigation();
 
-  // Bottom Sheet state
   const [selectedBook, setSelectedBook] = useState<PdfFile | null>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
 
+  // تحميل الكتب من قاعدة البيانات عند التركيز
   useFocusEffect(
     useCallback(() => {
-      const loadPdfs = async () => {
-        try {
-          const stored = await AsyncStorage.getItem("pdf_files");
-          setPdfs(JSON.parse(stored || "[]"));
-        } catch (err) {
-          console.error("Error loading saved files:", err);
-        }
-      };
-      loadPdfs();
+      (async () => {
+        const storedBooks = await getAllBooks();
+        setPdfs(storedBooks);
+      })();
     }, [])
   );
 
-  useEffect(() => {
-    AsyncStorage.setItem("pdf_files", JSON.stringify(pdfs));
-  }, [pdfs]);
-
+  // اختيار كتب جديدة
   const handleSelectFile = useCallback(async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: "application/pdf",
-        multiple: true,
-      });
+    const result = await DocumentPicker.getDocumentAsync({
+      type: "application/pdf",
+      multiple: true,
+    });
 
-      if (result.canceled) return;
+    if (result.canceled) return;
 
-      setPdfs((currentPdfs) => {
-        const existingUris = new Set(currentPdfs.map((p) => p.uri));
-        const newFiles = result.assets
-          .filter((f) => !existingUris.has(f.uri))
-          .map((f) => ({
-            name: f.name,
-            uri: f.uri,
-          }));
+    const newFiles = result.assets.map((f) => ({
+      name: f.name,
+      uri: f.uri,
+    }));
 
-        if (newFiles.length === 0) {
-          return currentPdfs; // No new files were added
-        }
+    await addBooks(newFiles);
+    const updated = await getAllBooks();
+    setPdfs(updated);
 
-        const updatedPdfs = [...currentPdfs, ...newFiles];
-        const fileToProcess = updatedPdfs.find((pdf) => !pdf.pages);
-        setProcessingFile(fileToProcess || null);
-        return updatedPdfs;
-      });
-    } catch (err) {
-      console.error("Error selecting file:", err);
-    }
+    const fileToProcess = newFiles.find((f) => !f.pages);
+    setProcessingFile(fileToProcess || null);
   }, []);
 
   useLayoutEffect(() => {
@@ -87,40 +62,29 @@ export default function Index() {
     bottomSheetRef.current?.expand();
   };
 
-  const handleDeleteBook = () => {
+  const handleDeleteBook = async () => {
     if (selectedBook) {
-      setPdfs((prevPdfs) => {
-        return prevPdfs.filter((pdf) => pdf.uri !== selectedBook.uri);
-      });
+      await deleteBook(selectedBook.uri);
+      const updated = await getAllBooks();
+      setPdfs(updated);
     }
     bottomSheetRef.current?.close();
   };
 
-  const handleUpdatePageCount = (uri: string, pages: number) => {
-    let nextFileToProcess: PdfFile | undefined;
-    const updatedPdfs = pdfs.map((pdf) => {
-      if (pdf.uri === uri && pdf.pages !== pages) {
-        return { ...pdf, pages };
-      }
-      // While we're iterating, find the next file that needs processing
-      if (pdf.uri !== uri && !pdf.pages) {
-        nextFileToProcess = pdf;
-      }
-      return pdf;
-    });
-    setPdfs(updatedPdfs);
-    setProcessingFile(nextFileToProcess || null);
+  const handleUpdatePageCount = async (uri: string, pages: number) => {
+    await updatePages(uri, pages);
+    const updated = await getAllBooks();
+    setPdfs(updated);
   };
 
   return (
     <View style={styles.container}>
-      {/* Hidden PDF component for processing page counts in the background */}
       {processingFile && (
         <Pdf
           source={{ uri: processingFile.uri }}
-          onLoadComplete={(numberOfPages) => {
-            handleUpdatePageCount(processingFile.uri, numberOfPages);
-          }}
+          onLoadComplete={(numberOfPages) =>
+            handleUpdatePageCount(processingFile.uri, numberOfPages)
+          }
           style={styles.hiddenPdf}
         />
       )}
@@ -131,9 +95,9 @@ export default function Index() {
         </Text>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
-          {pdfs.map((file, i) => (
+          {pdfs.map((file) => (
             <BookCard
-              key={i}
+              key={file.uri}
               uri={file.uri}
               name={file.name}
               pages={file.pages}
