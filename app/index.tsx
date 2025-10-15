@@ -1,47 +1,51 @@
-import * as DocumentPicker from "expo-document-picker";
+import AddBookButton from "@/components/AddBookButton";
+import BookOptionsBottomSheet from "@/components/BookOptionsBottomSheet";
+import BottomSheet from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect, useState } from "react";
+import * as DocumentPicker from "expo-document-picker";
+import { useNavigation, useRouter } from "expo-router";
 import {
-  Alert,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { useRouter } from "expo-router";
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { ScrollView, Text, View } from "react-native";
+import BookCard from "../components/BookCard";
 
-type PDFFile = {
+type PdfFile = {
   name: string;
   uri: string;
   pages?: number;
 };
 
 export default function Index() {
-  const [files, setFiles] = useState<PDFFile[]>([]);
+  const [pdfs, setPdfs] = useState<PdfFile[]>([]);
   const router = useRouter();
+  const navigation = useNavigation();
 
-  // ✅ تحميل الملفات المحفوظة عند فتح التطبيق
+  // Bottom Sheet state
+  const [selectedBook, setSelectedBook] = useState<PdfFile | null>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
   useEffect(() => {
     (async () => {
       try {
         const stored = await AsyncStorage.getItem("pdf_files");
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed)) setFiles(parsed);
-        }
+        const parsed = JSON.parse(stored || "[]");
+        setPdfs(parsed);
       } catch (err) {
         console.error("Error loading saved files:", err);
       }
     })();
   }, []);
 
-  // ✅ حفظ الملفات تلقائيًا عند أي تعديل
   useEffect(() => {
-    AsyncStorage.setItem("pdf_files", JSON.stringify(files));
-  }, [files]);
+    AsyncStorage.setItem("pdf_files", JSON.stringify(pdfs));
+  }, [pdfs]);
 
-  // ✅ اختيار ملف جديد
-  const handleSelectFile = async () => {
+  const handleSelectFile = useCallback(async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
         type: "application/pdf",
@@ -55,70 +59,69 @@ export default function Index() {
         uri: f.uri,
       }));
 
-      // ✅ دمج الملفات الجديدة مع القديمة بدون تكرار
-      setFiles((prev) => {
-        const all = [...prev];
-        for (const file of newFiles) {
-          if (!all.find((f) => f.uri === file.uri)) all.push(file);
-        }
-        return all;
-      });
+      setPdfs((prev) => [...prev, ...newFiles]);
     } catch (err) {
       console.error("Error selecting file:", err);
-      Alert.alert("Error selecting file");
     }
+  }, []);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <AddBookButton onPress={handleSelectFile} />,
+    });
+  }, [navigation, handleSelectFile]);
+
+  const handleOpenOptions = (book: PdfFile) => {
+    setSelectedBook(book);
+    bottomSheetRef.current?.expand();
+  };
+
+  const handleDeleteBook = () => {
+    if (selectedBook) {
+      setPdfs((prevPdfs) => {
+        return prevPdfs.filter((pdf) => pdf.uri !== selectedBook.uri);
+      });
+    }
+    bottomSheetRef.current?.close();
   };
 
   return (
-    <View style={{ flex: 1, padding: 16, backgroundColor: "#f8f9fa" }}>
-      {/* زر اختيار الملفات */}
-      <TouchableOpacity
-        onPress={handleSelectFile}
-        style={{
-          backgroundColor: "#007bff",
-          padding: 12,
-          borderRadius: 8,
-          marginBottom: 16,
-        }}
-      >
-        <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>
-          Select PDF Files
-        </Text>
-      </TouchableOpacity>
-
-      {/* عرض الملفات */}
-      {files.length === 0 ? (
-        <Text style={{ textAlign: "center", color: "#666" }}>
-          No files added yet.
+    <View
+      style={{
+        flex: 1,
+        padding: 16,
+        backgroundColor: "#f8f9fa",
+      }}
+    >
+      {pdfs.length === 0 ? (
+        <Text style={{ textAlign: "center", marginTop: 20, fontSize: 16 }}>
+          No books added yet. Press the '+' icon to add your first book.
         </Text>
       ) : (
-        <ScrollView>
-          {files.map((file, i) => (
-            <TouchableOpacity
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {pdfs.map((file, i) => (
+            <BookCard
               key={i}
+              uri={file.uri}
+              name={file.name}
               onPress={() =>
                 router.push({
                   pathname: "/pdf-viewer",
-                  params: {
-                    uri: file.uri,
-                    name: file.name,
-                  },
+                  params: { uri: file.uri, name: file.name },
                 })
               }
-              style={{
-                paddingVertical: 12,
-                borderBottomWidth: 1,
-                borderColor: "#ddd",
-              }}
-            >
-              <Text style={{ fontSize: 16 }}>📄 {file.name}</Text>
-              {file.pages && (
-                <Text style={{ color: "gray" }}>Pages: {file.pages}</Text>
-              )}
-            </TouchableOpacity>
+              onOpenOptions={() => handleOpenOptions(file)}
+            />
           ))}
         </ScrollView>
       )}
+
+      <BookOptionsBottomSheet
+        ref={bottomSheetRef}
+        book={selectedBook}
+        onClose={() => bottomSheetRef.current?.close()}
+        onDelete={handleDeleteBook}
+      />
     </View>
   );
 }
