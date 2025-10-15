@@ -1,15 +1,26 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Pdf from "react-native-pdf";
 
 type Props = {
   uri: string;
   name: string;
+  pages?: number;
+  currentPage?: number;
   onPress?: () => void;
   onOpenOptions: () => void;
 };
 
-export default function BookCard({ uri, name, onPress, onOpenOptions }: Props) {
+export default function BookCard({
+  uri,
+  name,
+  pages,
+  currentPage,
+  onPress,
+  onOpenOptions,
+}: Props) {
+  const progress = pages && currentPage ? (currentPage / pages) * 100 : 0;
+
   return (
     <TouchableOpacity
       style={styles.card}
@@ -17,9 +28,19 @@ export default function BookCard({ uri, name, onPress, onOpenOptions }: Props) {
       onLongPress={onOpenOptions}
     >
       <Pdf source={{ uri }} page={1} singlePage={true} style={styles.cover} />
-      <Text numberOfLines={3} style={styles.title}>
-        {name}
-      </Text>
+      <View style={styles.infoContainer}>
+        <Text numberOfLines={3} style={styles.title}>
+          {name}
+        </Text>
+        <View>
+          {pages && <Text style={styles.pages}>{pages} pages</Text>}
+          {progress > 0 && (
+            <View style={styles.progressBarContainer}>
+              <View style={[styles.progressBar, { width: `${progress}%` }]} />
+            </View>
+          )}
+        </View>
+      </View>
     </TouchableOpacity>
   );
 }
@@ -43,7 +64,28 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: "hidden",
   },
+  infoContainer: {
+    flex: 1,
+    justifyContent: "space-between",
+  },
   title: {
     fontSize: 16,
+    flexShrink: 1,
+  },
+  pages: {
+    fontSize: 12,
+    color: "#6c757d",
+  },
+  progressBarContainer: {
+    height: 6,
+    width: "100%",
+    backgroundColor: "#e9ecef",
+    borderRadius: 3,
+    marginTop: 4,
+    overflow: "hidden",
+  },
+  progressBar: {
+    height: "100%",
+    backgroundColor: "#007bff",
   },
 });
