@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "kotoby",
+    "name": "كتبي",
     "slug": "kotoby",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,18 +10,12 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.kotoby"
+      "bundleIdentifier": "com.mnaggarse.kotoby"
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.kotoby"
+      "package": "com.mnaggarse.kotoby"
     },
     "web": {
       "output": "static",
@@ -32,6 +26,7 @@
       "forcesRTL": true
     },
     "plugins": [
+      "expo-sqlite",
       "expo-router",
       "expo-localization",
       [
@@ -39,14 +34,9 @@
         {
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
+          "resizeMode": "contain"
         }
-      ],
-      "expo-sqlite"
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

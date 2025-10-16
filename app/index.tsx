@@ -96,9 +96,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   emptyText: {
-    textAlign: "center",
-    marginTop: 20,
+    marginTop: 300,
     fontSize: 16,
+    maxWidth: "80%",
+    marginHorizontal: "auto",
     color: "#6c757d",
+    textAlign: "center",
   },
 });
