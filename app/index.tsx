@@ -50,9 +50,10 @@ export default function Index() {
   return (
     <View style={styles.container}>
       {books.length === 0 ? (
-        <Text style={styles.emptyText}>
-          No books added yet. Press the '+' icon to add your first book.
-        </Text>
+        <View style={styles.emptyTextContainer}>
+          <Text style={styles.emptyText}>لا توجد كتب بعد</Text>
+          <Text style={styles.emptyText}>اضغط على زر '+' لإضافة كتب.</Text>
+        </View>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.bookList}>
           {books.map((book) => (
@@ -95,12 +96,15 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     gap: 8,
   },
-  emptyText: {
+  emptyTextContainer: {
     marginTop: 300,
-    fontSize: 16,
     maxWidth: "80%",
     marginHorizontal: "auto",
-    color: "#6c757d",
+  },
+  emptyText: {
+    fontSize: 18,
     textAlign: "center",
+    fontFamily: "ibm-medium",
+    color: "#6c757d",
   },
 });

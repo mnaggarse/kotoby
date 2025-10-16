@@ -11,10 +11,10 @@ type Props = {
 
 const BookOptionsBottomSheet = forwardRef<BottomSheet, Props>(
   ({ book, onDelete, onClose }, ref) => {
-    const snapPoints = useMemo(() => ["28%"], []);
+    const snapPoints = useMemo(() => ["30%"], []);
 
     const renderBackdrop = useCallback(
-      (props: any) => <BottomSheetBackdrop opacity={0.3} {...props} disappearsOnIndex={-1} />,
+      (props: any) => <BottomSheetBackdrop opacity={0.1} {...props} disappearsOnIndex={-1} />,
       []
     );
 
@@ -29,10 +29,10 @@ const BookOptionsBottomSheet = forwardRef<BottomSheet, Props>(
         <BottomSheetView style={styles.content}>
           <Text style={styles.title}>{book?.name || "Book Options"}</Text>
           <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={onDelete}>
-            <Text style={styles.buttonText}>Delete Book</Text>
+            <Text style={styles.buttonText}>حذف الكتاب</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={onClose}>
-            <Text style={styles.buttonText}>Cancel</Text>
+            <Text style={styles.buttonText}>إلغاء</Text>
           </TouchableOpacity>
         </BottomSheetView>
       </BottomSheet>
@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 15,
     textAlign: "center",
+    fontFamily: "sf",
   },
   button: {
     width: "100%",
@@ -68,6 +69,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "sf",
   },
 });
