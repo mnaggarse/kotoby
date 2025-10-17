@@ -1,7 +1,7 @@
 import { addBooks } from "@/database/books";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import * as DocumentPicker from "expo-document-picker";
-import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import PdfPageImage from "react-native-pdf-page-image";
 
 type Props = {
@@ -43,12 +43,8 @@ export default function HomeHeaderButtons({ onBooksAdded }: Props) {
         <FontAwesome6 name="plus" size={22} color="black" />
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => Alert.alert("قريبًا")}>
-        <FontAwesome6 name="chart-simple" size={20} color="black" />
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => Alert.alert("قريبًا")}>
-        <FontAwesome6 name="gear" size={18} color="black" />
+      <TouchableOpacity>
+        <FontAwesome6 name="gear" size={20} color="black" />
       </TouchableOpacity>
     </View>
   );
@@ -59,6 +55,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: 16,
+    gap: 24,
   },
 });

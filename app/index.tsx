@@ -3,10 +3,11 @@ import HomeHeaderButtons from "@/components/HomeHeaderButtons";
 import { deleteBook, getAllBooks } from "@/database/books";
 import { Book } from "@/types";
 import BottomSheet from "@gorhom/bottom-sheet";
+import MasonryList from "@react-native-seoul/masonry-list";
 import { useIsFocused } from "@react-navigation/native";
 import { useNavigation, useRouter } from "expo-router";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import BookCard from "../components/BookCard";
 
 export default function Index() {
@@ -55,25 +56,25 @@ export default function Index() {
           <Text style={styles.emptyText}>اضغط على زر '+' لإضافة كتب.</Text>
         </View>
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.bookList}>
-          {books.map((book) => (
+        <MasonryList
+          data={books}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={3}
+          renderItem={({ item }) => (
             <BookCard
-              key={book.id}
-              book={book}
+              book={item}
               onPress={() =>
                 router.push({
                   pathname: "/pdf-viewer",
-                  params: {
-                    uri: book.uri,
-                    name: book.name,
-                    currentPage: book.currentPage,
-                  },
+                  params: { uri: item.uri, name: item.name, currentPage: item.currentPage },
                 })
               }
-              onOpenOptions={() => handleLongPress(book)}
+              onOpenOptions={() => handleLongPress(item)}
             />
-          ))}
-        </ScrollView>
+          )}
+          style={styles.bookList}
+          showsVerticalScrollIndicator={false}
+        />
       )}
 
       <BookOptionsBottomSheet
@@ -89,11 +90,13 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 4,
     backgroundColor: "#f8f9fa",
   },
   bookList: {
-    paddingBottom: 16,
+    paddingHorizontal: 4,
+    paddingBottom: 8,
     gap: 8,
   },
   emptyTextContainer: {

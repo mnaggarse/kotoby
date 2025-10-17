@@ -9,7 +9,7 @@ type Props = {
 };
 
 export default function BookCard({ book, onPress, onOpenOptions }: Props) {
-  const progress = (book.currentPage / book.pageCount) * 100;
+  const progress = Math.floor((book.currentPage / book.pageCount) * 100);
 
   return (
     <TouchableOpacity
@@ -26,9 +26,9 @@ export default function BookCard({ book, onPress, onOpenOptions }: Props) {
         <View>
           <View style={styles.pagesContainer}>
             <Text style={styles.pages}>
-              {book.currentPage} من {book.pageCount} صفحة
+              {book.pageCount}/{book.currentPage}
             </Text>
-            <Text style={styles.pages}>{progress.toFixed(1)}%</Text>
+            <Text style={styles.pages}>{progress}%</Text>
           </View>
 
           <View style={styles.progressBarContainer}>
@@ -42,21 +42,21 @@ export default function BookCard({ book, onPress, onOpenOptions }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    gap: 8,
     padding: 8,
     width: "100%",
     borderWidth: 1,
-    paddingRight: 10,
     borderRadius: 16,
     borderBottomWidth: 3,
     borderColor: "lightgray",
     backgroundColor: "white",
-    flexDirection: "row",
+    flexDirection: "column",
+    marginBottom: 8,
+    gap: 8,
   },
   cover: {
-    width: 80,
-    height: 110,
+    width: "100%",
     borderWidth: 1,
+    aspectRatio: 3 / 4,
     borderRadius: 8,
     overflow: "hidden",
     borderColor: "lightgray",
@@ -64,18 +64,20 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     justifyContent: "space-between",
+    gap: 8,
   },
   title: {
-    fontSize: 17,
-    lineHeight: 22,
+    fontSize: 14,
+    lineHeight: 20,
     fontFamily: "ibm-medium",
+    textAlign: "center",
   },
   pagesContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
   pages: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#6c757d",
     fontFamily: "ibm-regular",
   },
@@ -84,7 +86,6 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#e9ecef",
     borderRadius: 100,
-    marginTop: 4,
     overflow: "hidden",
   },
   progressBar: {
