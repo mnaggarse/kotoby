@@ -1,6 +1,7 @@
 import { addBooks } from "@/database/books";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import * as DocumentPicker from "expo-document-picker";
+import { router } from "expo-router";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import PdfPageImage from "react-native-pdf-page-image";
 
@@ -43,7 +44,7 @@ export default function HomeHeaderButtons({ onBooksAdded }: Props) {
         <FontAwesome6 name="plus" size={22} color="black" />
       </TouchableOpacity>
 
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push("/settings")}>
         <FontAwesome6 name="gear" size={20} color="black" />
       </TouchableOpacity>
     </View>

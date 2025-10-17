@@ -33,6 +33,10 @@ export async function deleteBook(uri: string) {
   await db.runAsync("DELETE FROM books WHERE uri = ?", [uri]);
 }
 
+export async function deleteAllBooks() {
+  await db.runAsync("DELETE FROM books");
+}
+
 export async function updateCurrentPage(uri: string, currentPage: number) {
   await db.runAsync("UPDATE books SET currentPage = ? WHERE uri = ?", [currentPage, uri]);
 }

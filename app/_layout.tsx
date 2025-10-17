@@ -17,10 +17,12 @@ export default function Layout() {
         screenOptions={{
           headerShown: true,
           headerTitleStyle: { fontFamily: "ibm-bold" },
+          headerTitleAlign: "center",
         }}
       >
-        <Stack.Screen name="index" options={{ title: "المكتبة" }} />
-        <Stack.Screen name="pdf-viewer" options={{ headerTitleAlign: "center" }} />
+        <Stack.Screen name="index" options={{ title: "المكتبة", headerTitleAlign: "left" }} />
+        <Stack.Screen name="pdf-viewer" />
+        <Stack.Screen name="settings" options={{ title: "الإعدادات" }} />
       </Stack>
     </GestureHandlerRootView>
   );
