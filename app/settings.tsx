@@ -63,7 +63,7 @@ export default function Settings() {
 
       {/* Profile Card */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>الملف الشخصي</Text>
+        <Text style={styles.cardTitle}>الحساب</Text>
         <TouchableOpacity style={[styles.button, styles.dangerButton]} onPress={handleResetData}>
           <Text style={styles.buttonText}>إعادة تعيين البيانات</Text>
         </TouchableOpacity>
@@ -81,23 +81,23 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   card: {
-    backgroundColor: "white",
-    borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
     borderWidth: 1,
+    borderRadius: 12,
+    marginBottom: 16,
+    backgroundColor: "white",
     borderColor: "#e0e0e0",
   },
   cardTitle: {
     fontSize: 18,
-    fontFamily: "ibm-bold",
     marginBottom: 12,
+    fontFamily: "ibm-bold",
   },
   settingRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   settingText: {
     fontSize: 16,

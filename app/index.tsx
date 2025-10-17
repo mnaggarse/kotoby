@@ -3,10 +3,11 @@ import HomeHeaderButtons from "@/components/HomeHeaderButtons";
 import { deleteBook, getAllBooks } from "@/database/books";
 import { Book } from "@/types";
 import BottomSheet from "@gorhom/bottom-sheet";
+import MasonryList from "@react-native-seoul/masonry-list";
 import { useIsFocused } from "@react-navigation/native";
 import { useNavigation, useRouter } from "expo-router";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import BookCard from "../components/BookCard";
 
 type BookSectionProps = {
@@ -25,6 +26,7 @@ export default function Index() {
   const router = useRouter();
   const isFocused = useIsFocused();
   const navigation = useNavigation();
+  const { width } = useWindowDimensions();
 
   const loadBooks = useCallback(async () => {
     const result = await getAllBooks();
@@ -71,17 +73,24 @@ export default function Index() {
     return (
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionTitle}>{title}</Text>
-        <View style={styles.bookList}>
-          {books.map((item) => (
-            <View key={item.id} style={styles.bookCardWrapper}>
+        <MasonryList
+          data={books}
+          keyExtractor={(item): string => item.id.toString()}
+          numColumns={3}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <View style={styles.bookCardWrapper}>
               <BookCard
                 book={item}
                 onPress={() => onBookPress(item)}
                 onOpenOptions={() => onBookLongPress(item)}
               />
             </View>
-          ))}
-        </View>
+          )}
+          onEndReachedThreshold={0.1}
+          style={{ alignSelf: "stretch" }}
+          contentContainerStyle={{ paddingHorizontal: 8 }}
+        />
       </View>
     );
   };
@@ -134,25 +143,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f9fa",
   },
   sectionContainer: {
-    paddingHorizontal: 12,
-    marginBottom: 8,
+    marginBottom: 18,
   },
   sectionTitle: {
     fontSize: 20,
     fontFamily: "ibm-bold",
-    marginBottom: 8,
-    marginLeft: 4,
-    marginTop: 16,
-  },
-  bookList: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginHorizontal: -4, // Counteract the card margin
+    marginBottom: 4,
+    marginLeft: 16,
+    marginTop: 8,
   },
   bookCardWrapper: {
-    width: "33.33%", // for 3 columns
-    paddingHorizontal: 4,
-    paddingBottom: 8,
+    margin: 4,
+    flex: 1,
   },
   emptyTextContainer: {
     marginTop: 300,
