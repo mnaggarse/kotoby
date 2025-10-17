@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
     borderColor: "lightgray",
     backgroundColor: "white",
     flexDirection: "column",
-    marginBottom: 8,
     gap: 8,
   },
   cover: {
