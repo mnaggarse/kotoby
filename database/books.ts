@@ -20,7 +20,11 @@ export async function getAllBooks() {
   return result as Book[];
 }
 
-export async function addBooks(books: Book[]) {
+export async function addBooks(books: Book | Book[]) {
+  if (!Array.isArray(books)) {
+    books = [books];
+  }
+
   for (const book of books) {
     await db.runAsync(
       "INSERT INTO books (uri, name, cover, pageCount, currentPage) VALUES (?, ?, ?, ?, ?)",

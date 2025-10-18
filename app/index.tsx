@@ -78,7 +78,7 @@ export default function Index() {
           keyExtractor={(item): string => item.id.toString()}
           numColumns={3}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
+          renderItem={({item}) => (
             <View style={styles.bookCardWrapper}>
               <BookCard
                 book={item}
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     fontFamily: "ibm-bold",
     marginBottom: 4,
     marginLeft: 16,
-    marginTop: 8,
+    marginTop: 16,
   },
   bookCardWrapper: {
     margin: 4,

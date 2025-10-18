@@ -1,19 +1,75 @@
-import { deleteAllBooks } from "@/database/books";
+import { addBooks, deleteAllBooks, getAllBooks } from "@/database/books";
+import { Book } from "@/types";
+import { FontAwesome6 } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
+import { File, Paths } from "expo-file-system";
 import { router } from "expo-router";
-import React, { useState } from "react";
-import { Alert, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import * as Sharing from "expo-sharing";
+import React from "react";
+import {
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function Settings() {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-
-  const handleExportData = () => {
-    // TODO: Implement export functionality
-    Alert.alert("تصدير البيانات", "سيتم تنفيذ هذه الميزة قريبًا.");
+  const handleExportData = async () => {
+    try {
+      const books = await getAllBooks();
+      const data = JSON.stringify(books, null, 2);
+      const file = new File(Paths.document, "kotoby_backup.json");
+      await file.create({ overwrite: true });
+      file.write(data);
+      await Sharing.shareAsync(file.uri);
+    } catch (error) {
+      console.error("Export failed:", error);
+      Alert.alert("خطأ", "فشل تصدير البيانات.");
+    }
   };
 
-  const handleImportData = () => {
-    // TODO: Implement import functionality
-    Alert.alert("استيراد البيانات", "سيتم تنفيذ هذه الميزة قريبًا.");
+  const handleImportData = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "application/json",
+      });
+
+      if (result.canceled) {
+        return;
+      }
+
+      const file = new File(result.assets[0].uri);
+      const content = await file.text();
+      const booksToImport: Book[] = JSON.parse(content);
+
+      Alert.alert(
+        "استيراد البيانات",
+        "سيؤدي هذا إلى حذف جميع بياناتك الحالية واستبدالها بالبيانات الموجودة في الملف الذي اخترته. هل أنت متأكد؟",
+        [
+          { text: "إلغاء" },
+          {
+            text: "استيراد",
+            onPress: async () => {
+              try {
+                await deleteAllBooks();
+                await addBooks(booksToImport);
+                Alert.alert("نجاح", "تم استيراد البيانات بنجاح.", [
+                  { text: "حسنًا", onPress: () => router.back() },
+                ]);
+              } catch (e) {
+                Alert.alert("خطأ", "فشل استيراد البيانات.");
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      console.error("Import failed:", error);
+      Alert.alert("خطأ", "فشل استيراد البيانات.");
+    }
   };
 
   const handleResetData = () => {
@@ -30,33 +86,17 @@ export default function Settings() {
     );
   };
 
-  const handleChooseTime = () => {
-    // TODO: Implement time picker
-    Alert.alert("وقت الإشعارات", "سيتم تنفيذ هذه الميزة قريبًا.");
-  };
-
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      {/* Notifications Card */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>الإشعارات</Text>
-        <View style={styles.settingRow}>
-          <Text style={styles.settingText}>تفعيل الإشعارات</Text>
-          <Switch value={notificationsEnabled} onValueChange={setNotificationsEnabled} />
-        </View>
-        <TouchableOpacity style={styles.settingRow} onPress={handleChooseTime}>
-          <Text style={styles.settingText}>وقت الإشعار</Text>
-          <Text style={styles.settingValue}>10:00 صباحًا</Text>
-        </TouchableOpacity>
-      </View>
-
       {/* Data Management Card */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>إدارة البيانات</Text>
-        <TouchableOpacity style={styles.button} onPress={handleExportData}>
+        <TouchableOpacity style={[styles.button, styles.primaryButton]} onPress={handleExportData}>
+          <FontAwesome6 name="arrow-up-from-bracket" size={16} color="white" />
           <Text style={styles.buttonText}>تصدير البيانات</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleImportData}>
+        <TouchableOpacity style={[styles.button, styles.primaryButton]} onPress={handleImportData}>
+          <FontAwesome6 name="file-import" size={16} color="white" />
           <Text style={styles.buttonText}>استيراد البيانات</Text>
         </TouchableOpacity>
       </View>
@@ -65,6 +105,7 @@ export default function Settings() {
       <View style={styles.card}>
         <Text style={styles.cardTitle}>الحساب</Text>
         <TouchableOpacity style={[styles.button, styles.dangerButton]} onPress={handleResetData}>
+          <FontAwesome6 name="trash-can" size={16} color="white" />
           <Text style={styles.buttonText}>إعادة تعيين البيانات</Text>
         </TouchableOpacity>
       </View>
@@ -82,15 +123,22 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: 16,
-    borderWidth: 1,
     borderRadius: 12,
     marginBottom: 16,
     backgroundColor: "white",
-    borderColor: "#e0e0e0",
+    // Shadow for iOS
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    // Shadow for Android
+    elevation: 3,
+    borderWidth: Platform.OS === "android" ? 1 : 0,
+    borderColor: Platform.OS === "android" ? "#f0f0f0" : "transparent",
   },
   cardTitle: {
     fontSize: 18,
-    marginBottom: 12,
+    marginBottom: 8,
     fontFamily: "ibm-bold",
   },
   settingRow: {
@@ -109,11 +157,16 @@ const styles = StyleSheet.create({
     color: "#6c757d",
   },
   button: {
-    backgroundColor: "#007bff",
     padding: 12,
     borderRadius: 8,
-    alignItems: "center",
     marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+  },
+  primaryButton: {
+    backgroundColor: "#007bff",
   },
   dangerButton: {
     backgroundColor: "#dc3545",

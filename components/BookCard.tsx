@@ -1,6 +1,7 @@
 import { Book } from "@/types";
+import { Image } from "expo-image";
 import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
   book: Book;
@@ -18,7 +19,7 @@ export default function BookCard({ book, onPress, onOpenOptions }: Props) {
       onLongPress={onOpenOptions}
       activeOpacity={0.6}
     >
-      <Image source={{ uri: book.cover }} style={styles.cover} resizeMode="cover" />
+      <Image source={{ uri: book.cover }} style={styles.cover} contentFit="cover" />
       <View style={styles.infoContainer}>
         <Text numberOfLines={3} style={styles.title}>
           {book.name}
