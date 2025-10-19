@@ -76,9 +76,10 @@ export default function Index() {
         <MasonryList
           data={books}
           keyExtractor={(item): string => item.id.toString()}
+          refreshControl={false}
           numColumns={3}
           showsVerticalScrollIndicator={false}
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <View style={styles.bookCardWrapper}>
               <BookCard
                 book={item}

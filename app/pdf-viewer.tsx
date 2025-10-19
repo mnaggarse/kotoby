@@ -2,7 +2,7 @@ import { updateCurrentPage } from "@/database/books";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
+import { StyleSheet, useWindowDimensions, View } from "react-native";
 import Pdf from "react-native-pdf";
 
 export default function PdfViewer() {
@@ -14,6 +14,7 @@ export default function PdfViewer() {
   const navigation = useNavigation();
   const debounceTimer = useRef<number>(null);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const { width, height } = useWindowDimensions(); // ✅ يتحدث عند التدوير
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -23,7 +24,6 @@ export default function PdfViewer() {
     });
   }, [navigation, name, isHeaderVisible]);
 
-  // Toggles the header visibility on single tap
   const handleSingleTap = () => {
     setIsHeaderVisible((prev) => !prev);
   };
@@ -51,7 +51,7 @@ export default function PdfViewer() {
         page={currentPage ? parseInt(currentPage, 10) : 1}
         onPageChanged={handlePageChanged}
         onPageSingleTap={handleSingleTap}
-        style={styles.pdf}
+        style={{ width, height }} // ✅ الحجم يتغير تلقائيًا
         maxScale={4}
       />
     </View>
@@ -59,11 +59,5 @@ export default function PdfViewer() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  pdf: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-  },
+  container: { flex: 1 },
 });

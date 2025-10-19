@@ -3,7 +3,7 @@
     "name": "كتبي",
     "slug": "kotoby",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "kotoby",
     "userInterfaceStyle": "automatic",
