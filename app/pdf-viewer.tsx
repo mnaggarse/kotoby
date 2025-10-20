@@ -14,7 +14,7 @@ export default function PdfViewer() {
   const navigation = useNavigation();
   const debounceTimer = useRef<number>(null);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const { width, height } = useWindowDimensions(); // ✅ يتحدث عند التدوير
+  const { width, height } = useWindowDimensions();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -51,8 +51,9 @@ export default function PdfViewer() {
         page={currentPage ? parseInt(currentPage, 10) : 1}
         onPageChanged={handlePageChanged}
         onPageSingleTap={handleSingleTap}
-        style={{ width, height }} // ✅ الحجم يتغير تلقائيًا
-        maxScale={4}
+        spacing={4}
+        style={{ width, height }}
+        fitPolicy={0}
       />
     </View>
   );

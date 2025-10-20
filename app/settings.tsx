@@ -6,15 +6,7 @@ import { File, Paths } from "expo-file-system";
 import { router } from "expo-router";
 import * as Sharing from "expo-sharing";
 import React from "react";
-import {
-  Alert,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function Settings() {
   const handleExportData = async () => {
@@ -106,7 +98,7 @@ export default function Settings() {
         <Text style={styles.cardTitle}>الحساب</Text>
         <TouchableOpacity style={[styles.button, styles.dangerButton]} onPress={handleResetData}>
           <FontAwesome6 name="trash-can" size={16} color="white" />
-          <Text style={styles.buttonText}>إعادة تعيين البيانات</Text>
+          <Text style={styles.buttonText}>حذف جميع البيانات</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -123,18 +115,12 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 16,
+    borderWidth: 1,
+    borderBottomWidth: 3,
+    borderColor: "lightgray",
     backgroundColor: "white",
-    // Shadow for iOS
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    // Shadow for Android
-    elevation: 3,
-    borderWidth: Platform.OS === "android" ? 1 : 0,
-    borderColor: Platform.OS === "android" ? "#f0f0f0" : "transparent",
   },
   cardTitle: {
     fontSize: 18,
@@ -158,7 +144,7 @@ const styles = StyleSheet.create({
   },
   button: {
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     marginTop: 10,
     flexDirection: "row",
     alignItems: "center",

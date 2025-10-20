@@ -4,7 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function Layout() {
-  const [fontsLoaded] = useFonts({
+  useFonts({
     "ibm-regular": require("../assets/fonts/ibm-regular.ttf"),
     "ibm-medium": require("../assets/fonts/ibm-medium.ttf"),
     "ibm-bold": require("../assets/fonts/ibm-bold.ttf"),

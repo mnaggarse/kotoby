@@ -21,9 +21,9 @@ export default function BookCard({ book, onPress, onOpenOptions }: Props) {
     >
       <Image source={{ uri: book.cover }} style={styles.cover} contentFit="cover" />
       <View style={styles.infoContainer}>
-        <Text numberOfLines={3} style={styles.title}>
+        {/* <Text numberOfLines={3} style={styles.title}>
           {book.name}
-        </Text>
+        </Text> */}
         <View>
           <View style={styles.pagesContainer}>
             <Text style={styles.pages}>
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   cover: {
     width: "100%",
     borderWidth: 1,
-    aspectRatio: 3 / 4,
+    aspectRatio: 4 / 6,
     borderRadius: 8,
     overflow: "hidden",
     borderColor: "lightgray",

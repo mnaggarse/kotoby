@@ -7,7 +7,7 @@ import MasonryList from "@react-native-seoul/masonry-list";
 import { useIsFocused } from "@react-navigation/native";
 import { useNavigation, useRouter } from "expo-router";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import BookCard from "../components/BookCard";
 
 type BookSectionProps = {
@@ -26,7 +26,6 @@ export default function Index() {
   const router = useRouter();
   const isFocused = useIsFocused();
   const navigation = useNavigation();
-  const { width } = useWindowDimensions();
 
   const loadBooks = useCallback(async () => {
     const result = await getAllBooks();
@@ -159,8 +158,6 @@ const styles = StyleSheet.create({
   },
   emptyTextContainer: {
     marginTop: 300,
-    maxWidth: "80%",
-    marginHorizontal: "auto",
   },
   emptyText: {
     fontSize: 18,

@@ -50,10 +50,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
+    marginTop: 8,
+    marginBottom: 12,
     textAlign: "center",
-    fontFamily: "sf",
+    fontFamily: "ibm-medium",
   },
   button: {
     width: "100%",
@@ -69,6 +69,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 16,
-    fontFamily: "sf",
+    fontFamily: "ibm-medium",
   },
 });
